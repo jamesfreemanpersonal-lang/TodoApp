@@ -1,9 +1,13 @@
-import { ArrowBackIosNewRounded } from "@mui/icons-material";
-import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
+import { ArrowBackIosNewRounded, DarkModeRounded, LightModeRounded } from "@mui/icons-material";
+import { AppBar, Box, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useTheme } from "@emotion/react";
+import { useContext } from "react";
 import { getFontColor } from "../utils";
+import { UserContext } from "../contexts/UserContext";
+import { useSystemTheme } from "../hooks/useSystemTheme";
+import { isDarkMode } from "../utils/colorUtils";
 
 interface TopBarProps {
   title: string;
@@ -12,6 +16,11 @@ interface TopBarProps {
 export const TopBar = ({ title }: TopBarProps) => {
   const n = useNavigate();
   const theme = useTheme();
+  const { user, setUser } = useContext(UserContext);
+  const systemTheme = useSystemTheme();
+  const dark = isDarkMode(user.darkmode, systemTheme, theme.secondary);
+
+  const toggleDarkMode = () => setUser((prev) => ({ ...prev, darkmode: dark ? "light" : "dark" }));
 
   return (
     <Box sx={{ flexGrow: 1, mb: "100px" }}>
@@ -47,6 +56,19 @@ export const TopBar = ({ title }: TopBarProps) => {
           >
             {title}
           </Typography>
+          <Box sx={{ ml: "auto" }}>
+            <Tooltip title={dark ? "Switch to light mode" : "Switch to dark mode"}>
+              <IconButton
+                size="large"
+                color="inherit"
+                aria-label="Toggle dark mode"
+                onClick={toggleDarkMode}
+                sx={{ mr: "96px", color: getFontColor(theme.secondary) }}
+              >
+                {dark ? <LightModeRounded /> : <DarkModeRounded />}
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Toolbar>
       </StyledAppBar>
     </Box>
